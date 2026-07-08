@@ -14,6 +14,7 @@ page = st.sidebar.radio(
         "Submissions",
         "Rating Wise Questions",
         "Contest Info",
+        "Submission Stats",
         "Tags",
         "Correct Problems Solved",
         "Rating Graph"
@@ -100,6 +101,11 @@ def get_tags(r):
   tags=get_prblm_sol(r)['tags'].explode().value_counts()
   return tags
 
+def get_substat(submm):
+  x=submm['verdict'].value_counts()
+  x['Acceptance Rate']=(x['OK']/x.sum())*100
+  return x
+
 def get_rating_graph(ratt):
     fig = go.Figure()
     fig.add_trace(
@@ -172,3 +178,5 @@ if st.button("Analyze"):
            st.dataframe(get_prblm_sol(r))
         elif page=="Rating Wise Questions":
            st.dataframe(get_rating_q(r))
+        elif page=="Submission Stats":
+           st.dataframe(get_substat(submm))
