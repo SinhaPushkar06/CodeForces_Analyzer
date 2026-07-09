@@ -72,7 +72,20 @@ def get_submission(handle):
     st.error(sub["comment"])
     return None
 
-  submission = pd.DataFrame(sub["result"])
+  sub=requests.get("https://codeforces.com/api/user.status?handle={}".format(handle)).json()
+
+  submission=pd.DataFrame(sub['result'])
+  submission.rename(columns={'passedTestCount': 'Rating'}, inplace=True)
+  submission['Rating']=submission['problem'].apply(lambda x:x.get("rating"))
+  submission['problem']=submission['problem'].apply(lambda x:x['index']+" - "+x['name'])
+  submission['author']=submission['author'].apply(lambda x:x["participantType"])
+  submission=submission[['id','contestId','creationTimeSeconds','relativeTimeSeconds','problem','author','Rating','programmingLanguage','verdict','testset','timeConsumedMillis','memoryConsumedBytes']]
+  submission.rename(columns={'creationTimeSeconds': 'Date'}, inplace=True)
+  submission['Date'] = pd.to_datetime(submission['Date'],unit='s')
+
+  submission['relativeTimeSeconds'] = submission['relativeTimeSeconds'].apply(
+      lambda x: '-' if x == 2147483647 else str(pd.to_timedelta(x, unit='s'))
+  )
 
   return submission
 
