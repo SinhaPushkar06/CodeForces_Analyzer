@@ -72,14 +72,12 @@ def get_submission(handle):
     st.error(sub["comment"])
     return None
 
-  sub=requests.get("https://codeforces.com/api/user.status?handle={}".format(handle)).json()
-
   submission=pd.DataFrame(sub['result'])
   submission.rename(columns={'passedTestCount': 'Rating'}, inplace=True)
   submission['Rating']=submission['problem'].apply(lambda x:x.get("rating"))
-  submission['problem']=submission['problem'].apply(lambda x:x['index']+" - "+x['name'])
+  submission['Problem Name']=submission['problem'].apply(lambda x:x['index']+" - "+x['name'])
   submission['author']=submission['author'].apply(lambda x:x["participantType"])
-  submission=submission[['id','contestId','creationTimeSeconds','relativeTimeSeconds','problem','author','Rating','programmingLanguage','verdict','testset','timeConsumedMillis','memoryConsumedBytes']]
+  submission=submission[['id','contestId','creationTimeSeconds','relativeTimeSeconds','Problem Name','author','Rating','programmingLanguage','verdict','testset','timeConsumedMillis','memoryConsumedBytes','problem']]
   submission.rename(columns={'creationTimeSeconds': 'Date'}, inplace=True)
   submission['Date'] = pd.to_datetime(submission['Date'],unit='s')
 
@@ -103,8 +101,7 @@ def get_rating(handle):
   return ratings
 
 def get_rating_q(r):
-  rated_q=r['problem'].apply(lambda x: x.get('rating')).value_counts().sort_index(ascending=True)
-  return rated_q
+  return r['Rating'].value_counts().sort_index()
 
 def get_prblm_sol(r):
   problems_solved=pd.DataFrame(r['problem'].tolist()).drop_duplicates(subset=["name"])
@@ -176,11 +173,11 @@ if st.button("Analyze"):
     
 
     if(infor is not None and submm is not None and ratt is not None):
-        r=submm[submm['verdict']=='OK'].reset_index()
+        r=submm[submm['verdict']=='OK'].reset_index(drop=True)
         if page=="Profile":
            st.dataframe(get_profile(infor))
         elif page=="Submissions":
-           st.dataframe(submm)
+           st.dataframe(submm.drop(columns=['problem']))
         elif page=="Contest Info":
            st.dataframe(ratt)
         elif page=="Tags":
