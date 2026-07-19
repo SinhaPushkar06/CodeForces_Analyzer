@@ -16,8 +16,9 @@ page = st.sidebar.radio(
         "Contest Info",
         "Submission Stats",
         "Tags",
+        "Weak Topics",
         "Correct Problems Solved",
-        "Rating Graph"
+        "Rating Graph",
     ]
 )
 
@@ -86,6 +87,9 @@ def get_submission(handle):
   )
 
   return submission
+def wrong_sub(submm):
+   wt=pd.DataFrame(submm[submm['verdict']!='OK']['problem'].tolist())
+   return wt['tags'].explode().value_counts()
 
 def get_rating(handle):
   try:
@@ -190,3 +194,6 @@ if st.button("Analyze"):
            st.dataframe(get_rating_q(r))
         elif page=="Submission Stats":
            st.dataframe(get_substat(submm))
+        elif page=="Weak Topics":
+           st.dataframe(wrong_sub(submm))
+           
