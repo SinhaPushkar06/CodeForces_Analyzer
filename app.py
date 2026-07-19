@@ -88,7 +88,7 @@ def get_submission(handle):
 
   return submission
 def wrong_sub(submm):
-   wt=pd.DataFrame(submm[submm['verdict']!='OK']['problem'].tolist())
+   wt=pd.DataFrame(submm[submm['verdict']!='OK']['problem'].tolist()).drop_duplicates(subset=['contestId', 'index'])
    return wt['tags'].explode().value_counts()
 
 def get_rating(handle):
