@@ -105,7 +105,7 @@ def get_rating(handle):
   return ratings
 
 def get_rating_q(r):
-  return r['Rating'].value_counts().sort_index()
+  return r.drop_duplicates(subset=['contestId', 'Problem Name'])['Rating'].value_counts().sort_index()
 
 def get_prblm_sol(r):
   problems_solved=pd.DataFrame(r['problem'].tolist()).drop_duplicates(subset=["name"])
